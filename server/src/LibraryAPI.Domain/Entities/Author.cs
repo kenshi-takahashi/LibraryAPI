@@ -8,5 +8,8 @@ namespace LibraryAPI.Domain.Entities {
         
         // Navigation property
         public ICollection<Book> Books { get; set; } = new HashSet<Book>();
+
+        // Computed property
+        public string FullName => $"{FirstName} {LastName}";
     }
 }
