@@ -11,5 +11,8 @@ namespace LibraryAPI.Domain.Entities {
         // Navigation properties
         public Role? Role { get; set; }
         public ICollection<Book> BorrowedBooks { get; set; } = new HashSet<Book>();
+
+        // Computed property
+        public string FullName => $"{FirstName} {LastName}";
     }
 }
