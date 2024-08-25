@@ -5,20 +5,25 @@ public class UserRepository : BaseRepository<User>, IUserRepository
 {
     public UserRepository(DbContext context) : base(context) { }
 
-    public async Task<User> GetByEmailAsync(string email)
+    public async Task<IEnumerable<User>> GetByEmailAsync(string email)
     {
-        return await _dbSet.AsNoTracking().FirstOrDefaultAsync(u => u.Email.Contains(email));
+        return await _dbSet.AsNoTracking()
+            .Where(u => u.Email.Contains(email))
+            .ToListAsync();
     }
 
-    public async Task<User> GetByRoleAsync(string role)
+    public async Task<IEnumerable<User>> GetByRoleAsync(string role)
     {
         return await _dbSet.AsNoTracking()
             .Include(u => u.Role)
-            .FirstOrDefaultAsync(u => u.Role.Name.Contains(role));
+            .Where(u => u.Role.Name.Contains(role))
+            .ToListAsync();
     }
 
-    public async Task<User> GetByFullNameAsync(string fullName)
+    public async Task<IEnumerable<User>> GetByFullNameAsync(string fullName)
     {
-        return await _dbSet.AsNoTracking().FirstOrDefaultAsync(u => u.FullName.Contains(fullName));
+        return await _dbSet.AsNoTracking()
+            .Where(u => u.FullName.Contains(fullName))
+            .ToListAsync();
     }
 }

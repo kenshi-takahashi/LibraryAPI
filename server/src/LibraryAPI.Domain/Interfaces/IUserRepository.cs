@@ -2,7 +2,7 @@ using LibraryAPI.Domain.Entities;
 
 public interface IUserRepository : IBaseRepository<User>
 {
-    Task<User> GetByEmailAsync(string email);
-    Task<User> GetByRoleAsync(string role);
-    Task<User> GetByFullNameAsync(string fullName);
+    Task<IEnumerable<User>> GetByEmailAsync(string email);
+    Task<IEnumerable<User>> GetByRoleAsync(string role);
+    Task<IEnumerable<User>> GetByFullNameAsync(string fullName);
 }
