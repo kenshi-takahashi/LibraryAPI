@@ -76,6 +76,9 @@ namespace LibraryAPI.Infrastructure.Migrations
                     b.Property<DateTime?>("BorrowedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -192,7 +195,7 @@ namespace LibraryAPI.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("RoleId")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -230,7 +233,8 @@ namespace LibraryAPI.Infrastructure.Migrations
                     b.HasOne("LibraryAPI.Domain.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
 
                     b.Navigation("Role");
                 });
