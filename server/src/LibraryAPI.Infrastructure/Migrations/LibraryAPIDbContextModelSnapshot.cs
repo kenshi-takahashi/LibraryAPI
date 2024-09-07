@@ -233,7 +233,7 @@ namespace LibraryAPI.Infrastructure.Migrations
                     b.HasOne("LibraryAPI.Domain.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Role");

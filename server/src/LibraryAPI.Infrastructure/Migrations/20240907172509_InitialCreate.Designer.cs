@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryAPI.Infrastructure.Migrations
 {
     [DbContext(typeof(LibraryAPIDbContext))]
-    [Migration("20240907171606_InitialCreate")]
+    [Migration("20240907172509_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -236,7 +236,7 @@ namespace LibraryAPI.Infrastructure.Migrations
                     b.HasOne("LibraryAPI.Domain.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Role");

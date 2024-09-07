@@ -22,7 +22,6 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
 
         builder.HasMany(r => r.Users)
             .WithOne(u => u.Role)
-            .HasForeignKey(u => u.RoleId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .HasForeignKey(u => u.RoleId);
     }
 }
