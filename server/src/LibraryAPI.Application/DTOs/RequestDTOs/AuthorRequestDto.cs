@@ -1,5 +1,5 @@
 namespace LibraryAPI.Application.DTOs {
-    public class AuthorCreateRequestDto
+    public class AuthorRequestDto
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
