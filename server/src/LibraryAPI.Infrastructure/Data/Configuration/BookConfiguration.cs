@@ -25,6 +25,9 @@ public class BookConfiguration : IEntityTypeConfiguration<Book>
         builder.Property(b => b.Description)
             .HasColumnType("nvarchar(max)");
 
+        builder.Property(b => b.Count)
+             .HasColumnType("int");
+
         builder.Property(b => b.BorrowedAt)
             .HasColumnType("datetime2");
 
