@@ -1,3 +1,4 @@
+using LibraryAPI.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<LibraryAPIDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+builder.Services.AddCustomServices();
 
 var app = builder.Build();
 
