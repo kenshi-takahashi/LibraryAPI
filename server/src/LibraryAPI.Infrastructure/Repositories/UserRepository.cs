@@ -3,13 +3,12 @@ using LibraryAPI.Domain.Entities;
 
 public class UserRepository : BaseRepository<User>, IUserRepository
 {
-    public UserRepository(DbContext context) : base(context) { }
+    public UserRepository(LibraryAPIDbContext context) : base(context) { }
 
-    public async Task<IEnumerable<User>> GetByEmailAsync(string email)
+    public async Task <User> GetByEmailAsync(string email)
     {
         return await _dbSet.AsNoTracking()
-            .Where(u => u.Email.Contains(email))
-            .ToListAsync();
+            .FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task<IEnumerable<User>> GetByRoleAsync(string role)
