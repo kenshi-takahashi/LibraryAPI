@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LibraryAPI.Domain\LibraryAPI.Domain.csproj" />
+    <ProjectReference Include="..\LibraryAPI.Application\LibraryAPI.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
