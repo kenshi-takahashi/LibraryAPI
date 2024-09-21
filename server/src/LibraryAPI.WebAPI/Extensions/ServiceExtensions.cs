@@ -11,9 +11,11 @@ namespace LibraryAPI.Extensions
             // Services
             services.AddTransient<ITokenService, TokenService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
 
             //Repositories
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
             // Validators
             services.AddValidatorsFromAssemblyContaining<UserRegistrationRequestValidator>();
