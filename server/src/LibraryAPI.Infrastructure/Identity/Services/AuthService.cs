@@ -3,6 +3,7 @@ using LibraryAPI.Domain.Entities;
 using FluentValidation;
 using System.Security.Claims;
 using LibraryAPI.Application.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace LibraryAPI.Application.Services
 {
@@ -13,19 +14,22 @@ namespace LibraryAPI.Application.Services
         private readonly IValidator<UserRegistrationRequestDto> _registrationValidator;
         private readonly IValidator<UserLoginRequestDto> _loginValidator;
         private readonly IValidator<TokenRequestDto> _tokenRequestValidator;
+        private readonly JwtSettings _jwtSettings;
 
         public AuthService(
             ITokenService tokenService,
             IUserRepository userRepository,
             IValidator<UserRegistrationRequestDto> registrationValidator,
             IValidator<UserLoginRequestDto> loginValidator,
-            IValidator<TokenRequestDto> tokenRequestValidator)
+            IValidator<TokenRequestDto> tokenRequestValidator,
+            IOptions<JwtSettings> jwtSettings)
         {
             _tokenService = tokenService;
             _userRepository = userRepository;
             _registrationValidator = registrationValidator;
             _loginValidator = loginValidator;
             _tokenRequestValidator = tokenRequestValidator;
+            _jwtSettings = jwtSettings.Value;
         }
 
         public async Task<string> Register(UserRegistrationRequestDto registrationDto)
@@ -71,11 +75,11 @@ namespace LibraryAPI.Application.Services
             }
 
             var claims = new List<Claim>
-        {
+            {
             new Claim(ClaimTypes.Name, user.Email),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Role, user.Role.Name)
-        };
+            };
 
             var accessToken = _tokenService.GenerateAccessToken(claims);
             var refreshToken = _tokenService.GenerateRefreshToken();
@@ -83,7 +87,7 @@ namespace LibraryAPI.Application.Services
             user.RefreshToken = new RefreshToken
             {
                 Token = refreshToken,
-                ExpirationDate = DateTime.Now.AddDays(7)
+                ExpirationDate = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpirationDays)
             };
             await _userRepository.UpdateAsync(user);
 
@@ -91,7 +95,7 @@ namespace LibraryAPI.Application.Services
             {
                 Token = accessToken,
                 RefreshToken = refreshToken,
-                TokenExpiration = DateTime.Now.AddMinutes(30)
+                TokenExpiration = DateTime.Now.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes)
             };
         }
 
@@ -119,7 +123,7 @@ namespace LibraryAPI.Application.Services
             user.RefreshToken = new RefreshToken
             {
                 Token = newRefreshToken,
-                ExpirationDate = DateTime.Now.AddDays(7)
+                ExpirationDate = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpirationDays)
             };
             await _userRepository.UpdateAsync(user);
 
@@ -127,7 +131,7 @@ namespace LibraryAPI.Application.Services
             {
                 Token = newAccessToken,
                 RefreshToken = newRefreshToken,
-                TokenExpiration = DateTime.Now.AddMinutes(30)
+                TokenExpiration = DateTime.Now.AddMinutes(_jwtSettings.AccessTokenExpirationMinutes)
             };
         }
     }
