@@ -1,6 +1,7 @@
 using AutoMapper;
 using LibraryAPI.Domain.Entities;
 using LibraryAPI.Application.DTOs;
+using LibraryAPI.Application.Common;
 
 namespace LibraryAPI.Application.Mapper
 {
@@ -28,6 +29,10 @@ namespace LibraryAPI.Application.Mapper
             CreateMap<UserAdminUpdateRequestDto, User>();
             CreateMap<User, UserAdminResponseDto>();
             CreateMap<User, UserSelfResponseDto>();
+
+            // PaginatedList mapping
+            CreateMap<PaginatedList<Author>, PaginatedResponseDto<AuthorResponseDto>>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
         }
     }
 }

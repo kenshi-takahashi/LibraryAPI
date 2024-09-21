@@ -5,4 +5,6 @@ public interface IBaseRepository<T> where T : class
     Task AddAsync(T entity);
     Task UpdateAsync(T entity);
     Task DeleteAsync(T entity);
+    Task<IEnumerable<T>> GetPaginatedItemsAsync(int pageIndex, int pageSize);
+    Task<int> GetTotalCountAsync();
 }

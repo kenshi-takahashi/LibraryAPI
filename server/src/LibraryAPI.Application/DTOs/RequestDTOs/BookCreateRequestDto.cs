@@ -1,4 +1,5 @@
-namespace LibraryAPI.Application.DTOs {
+namespace LibraryAPI.Application.DTOs 
+{
     public class BookCreateRequestDto
     {
         public string ISBN { get; set; }
