@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 public class BaseRepository<T> : IBaseRepository<T> where T : class
 {
-    protected readonly DbContext _context;
+    protected readonly LibraryAPIDbContext _context;
     protected readonly DbSet<T> _dbSet;
 
-    public BaseRepository(DbContext context)
+    public BaseRepository(LibraryAPIDbContext context)
     {
         _context = context;
         _dbSet = context.Set<T>();

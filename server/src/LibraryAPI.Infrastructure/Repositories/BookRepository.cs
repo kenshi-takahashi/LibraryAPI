@@ -3,7 +3,7 @@ using LibraryAPI.Domain.Entities;
 
 public class BookRepository : BaseRepository<Book>, IBookRepository
 {
-    public BookRepository(DbContext context) : base(context) { }
+    public BookRepository(LibraryAPIDbContext context) : base(context) { }
 
     public async Task<IEnumerable<Book>> GetByISBNAsync(string isbn)
     {
