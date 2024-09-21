@@ -8,6 +8,7 @@ public class LibraryAPIDbContext : DbContext
     public DbSet<Author> Authors { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     public LibraryAPIDbContext(DbContextOptions<LibraryAPIDbContext> options)
         : base(options)

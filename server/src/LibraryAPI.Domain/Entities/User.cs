@@ -7,6 +7,7 @@ namespace LibraryAPI.Domain.Entities {
         public string FirstName { get; set; }
         public string? MiddleName { get; set; }
         public int RoleId { get; set; }
+        public RefreshToken RefreshToken { get; set; }
         
         // Navigation properties
         public Role? Role { get; set; }
