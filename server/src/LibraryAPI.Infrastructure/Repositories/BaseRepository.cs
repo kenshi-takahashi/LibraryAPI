@@ -38,4 +38,17 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         _dbSet.Remove(entity);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<T>> GetPaginatedItemsAsync(int pageIndex, int pageSize)
+    {
+        return await _dbSet.AsNoTracking()
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    public async Task<int> GetTotalCountAsync()
+    {
+        return await _dbSet.CountAsync();
+    }
 }
