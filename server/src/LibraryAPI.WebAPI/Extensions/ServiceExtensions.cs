@@ -1,5 +1,6 @@
-using AutoMapper;
-using LibraryAPI.Application.Mapper;
+using FluentValidation;
+using LibraryAPI.Application.Interfaces;
+using LibraryAPI.Application.Services;
 
 namespace LibraryAPI.Extensions
 {
@@ -7,13 +8,15 @@ namespace LibraryAPI.Extensions
     {
         public static IServiceCollection AddCustomServices(this IServiceCollection services)
         {
-            var mappingConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new MappingProfile());
-            });
+            // Services
+            services.AddTransient<ITokenService, TokenService>();
+            services.AddScoped<IAuthService, AuthService>();
 
-            IMapper mapper = mappingConfig.CreateMapper();
-            services.AddSingleton(mapper);
+            //Repositories
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            // Validators
+            services.AddValidatorsFromAssemblyContaining<UserRegistrationRequestValidator>();
 
             return services;
         }
