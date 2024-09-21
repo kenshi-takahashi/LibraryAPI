@@ -27,7 +27,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(100);
 
         builder.Property(u => u.MiddleName)
+            .IsRequired(false)
             .HasMaxLength(100);
+
+        builder.OwnsOne(u => u.RefreshToken, rt =>
+        {
+            rt.Property(r => r.Token).HasMaxLength(500);
+            rt.Property(r => r.ExpirationDate).HasColumnType("datetime2");
+        });
 
         builder.Property(u => u.CreatedAt)
             .HasDefaultValueSql("GETUTCDATE()");
