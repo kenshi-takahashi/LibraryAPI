@@ -43,7 +43,7 @@ public class TokenService : ITokenService
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = false, // Мы не проверяем срок действия токена
+            ValidateLifetime = false,
             ValidateIssuerSigningKey = true,
             ValidIssuer = _jwtSettings.Issuer,
             ValidAudience = _jwtSettings.Audience,
