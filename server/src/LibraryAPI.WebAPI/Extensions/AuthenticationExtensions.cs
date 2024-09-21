@@ -8,6 +8,8 @@ namespace LibraryAPI.Extensions
     {
         public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+
             var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
             var secretKey = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
 
