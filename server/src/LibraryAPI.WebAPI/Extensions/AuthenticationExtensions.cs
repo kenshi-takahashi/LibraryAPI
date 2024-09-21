@@ -13,6 +13,20 @@ namespace LibraryAPI.Extensions
             var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
             var secretKey = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
 
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = true,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+            };
+
+            services.AddSingleton(tokenValidationParameters);
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -20,16 +34,7 @@ namespace LibraryAPI.Extensions
             })
             .AddJwtBearer(options =>
             {
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidateLifetime = true,
-                    ValidIssuer = jwtSettings.Issuer,
-                    ValidAudience = jwtSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(secretKey)
-                };
+                options.TokenValidationParameters = tokenValidationParameters;
             });
 
             return services;
