@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryAPI.Infrastructure.Migrations
 {
     [DbContext(typeof(LibraryAPIDbContext))]
-    [Migration("20240907172509_InitialCreate")]
+    [Migration("20240919155053_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -237,6 +237,30 @@ namespace LibraryAPI.Infrastructure.Migrations
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("LibraryAPI.Domain.Entities.RefreshToken", "RefreshToken", b1 =>
+                        {
+                            b1.Property<int>("UserId")
+                                .HasColumnType("int");
+
+                            b1.Property<DateTime>("ExpirationDate")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<string>("Token")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)");
+
+                            b1.HasKey("UserId");
+
+                            b1.ToTable("RefreshTokens");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserId");
+                        });
+
+                    b.Navigation("RefreshToken")
                         .IsRequired();
 
                     b.Navigation("Role");
