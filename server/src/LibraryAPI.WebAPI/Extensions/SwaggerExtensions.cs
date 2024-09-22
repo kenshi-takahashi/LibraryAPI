@@ -33,5 +33,18 @@ namespace LibraryAPI.Extensions
 
             return services;
         }
+
+        public static IApplicationBuilder UseSwaggerWithDarkTheme(this IApplicationBuilder app)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.InjectStylesheet("/swagger-ui/swagger-dark-theme.css");
+                c.ConfigObject.AdditionalItems["theme"] = "dark";
+            });
+
+            return app;
+        }
     }
 }
