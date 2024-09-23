@@ -6,7 +6,7 @@ public interface IBookService
     Task<IEnumerable<BookAdminResponseDto>> GetAllBooksAsync();
     Task<BookAdminResponseDto> GetBookByIdAsync(int id);
     Task<IEnumerable<BookAdminResponseDto>> GetBooksByISBNAsync(string isbn);
-    Task AddBookAsync(BookCreateRequestDto bookDto);
+    Task AddBookAsync(BookCreateRequestDto bookDto, string imagePath = null);
     Task UpdateBookAsync(int id, BookUpdateRequestDto bookDto);
     Task DeleteBookAsync(int id);
     Task BorrowBookAsync(int bookId, int userId);
