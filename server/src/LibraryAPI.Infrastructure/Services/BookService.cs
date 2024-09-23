@@ -1,4 +1,5 @@
 using AutoMapper;
+using FluentValidation;
 using LibraryAPI.Application.DTOs;
 using LibraryAPI.Application.Interfaces;
 using LibraryAPI.Domain.Entities;
@@ -11,10 +12,17 @@ public class BookService : BaseService<Book>, IBookService
     // private readonly IEmailSender _emailSender;
     private readonly IMapper _mapper;
     private readonly IMemoryCache _cache;
+    private readonly IValidator<BookCreateRequestDto> _createValidator;
+    private readonly IValidator<BookUpdateRequestDto> _updateValidator;
+    private readonly IValidator<BorrowBookRequestDto> _borrowValidator;
+    
 
     public BookService(IBookRepository bookRepository,
         IMapper mapper, IMemoryCache cache,
-        IUserRepository userRepository
+        IUserRepository userRepository,
+        IValidator<BookCreateRequestDto> createValidator,
+        IValidator<BookUpdateRequestDto> updateValidator,
+        IValidator<BorrowBookRequestDto> borrowValidator
     // IEmailSender emailService
     ) : base(bookRepository)
     {
@@ -23,6 +31,9 @@ public class BookService : BaseService<Book>, IBookService
         // _emailSender = emailService;
         _mapper = mapper;
         _cache = cache;
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
+        _borrowValidator = borrowValidator;
     }
 
     public async Task<PaginatedResponseDto<BookUserResponseDto>> GetBooksPaginatedAsync(PaginatedRequestDto request)
@@ -71,20 +82,32 @@ public class BookService : BaseService<Book>, IBookService
     }
 
 
-    public async Task AddBookAsync(BookCreateRequestDto bookDto, string imagePath = null)
+    public async Task AddBookAsync(BookCreateRequestDto bookDto)
     {
+        var validationResult = await _createValidator.ValidateAsync(bookDto);
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
+
         var book = _mapper.Map<Book>(bookDto);
         await _bookRepository.AddAsync(book);
 
-        if (!string.IsNullOrEmpty(imagePath))
+        if (!string.IsNullOrEmpty(bookDto.Image))
         {
-            await AddBookImageAsync(book.Id, imagePath);
+            await AddBookImageAsync(book.Id, bookDto.Image);
         }
     }
 
 
     public async Task UpdateBookAsync(int id, BookUpdateRequestDto bookDto)
     {
+        var validationResult = await _updateValidator.ValidateAsync(bookDto);
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
+
         var cacheKey = $"Book_{id}";
 
         var book = await _bookRepository.GetByIdAsync(id);
@@ -107,12 +130,18 @@ public class BookService : BaseService<Book>, IBookService
         }
     }
 
-    public async Task BorrowBookAsync(int bookId, int userId)
+    public async Task BorrowBookAsync(BorrowBookRequestDto borrowDto)
     {
-        var book = await _bookRepository.GetByIdAsync(bookId);
+        var validationResult = await _borrowValidator.ValidateAsync(borrowDto);
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
+
+        var book = await _bookRepository.GetByIdAsync(borrowDto.BookId);
         if (book != null && book.IsAvailable)
         {
-            book.UserId = userId;
+            book.UserId = borrowDto.UserId;
             book.BorrowedAt = DateTime.UtcNow;
             book.ReturnBy = DateTime.UtcNow.AddDays(14);
             book.IsAvailable = false;
