@@ -47,9 +47,9 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddBook([FromBody] BookCreateRequestDto bookDto, string imagePath = null)
+        public async Task<IActionResult> AddBook([FromBody] BookCreateRequestDto bookDto)
         {
-            await _bookService.AddBookAsync(bookDto, imagePath);
+            await _bookService.AddBookAsync(bookDto);
             return NoContent();
         }
 
@@ -68,9 +68,9 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpPost("{id}/borrow")]
-        public async Task<IActionResult> BorrowBook(int id, [FromQuery] int userId)
+        public async Task<IActionResult> BorrowBook(BorrowBookRequestDto borrowDto)
         {
-            await _bookService.BorrowBookAsync(id, userId);
+            await _bookService.BorrowBookAsync(borrowDto);
             return NoContent();
         }
 
