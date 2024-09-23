@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using FluentValidation;
 
 namespace LibraryAPI.WebAPI.Middleware
 {
@@ -62,6 +63,11 @@ namespace LibraryAPI.WebAPI.Middleware
                     context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
                     return WriteResponseAsync(context, "An invalid cast occurred.", exception.Message);
 
+                case ValidationException validationEx:
+                    context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    var errors = string.Join(", ", validationEx.Errors.Select(e => e.ErrorMessage));
+                    return WriteResponseAsync(context, "Validation errors occurred.", errors);
+
                 default:
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     return WriteResponseAsync(context, "Internal server error. Please try again later.", exception.Message);
@@ -74,7 +80,7 @@ namespace LibraryAPI.WebAPI.Middleware
             {
                 StatusCode = context.Response.StatusCode,
                 Message = message,
-                // Detailed = detailedMessage
+                Detailed = detailedMessage
             };
 
             var jsonResponse = JsonSerializer.Serialize(response);

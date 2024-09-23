@@ -7,6 +7,6 @@ namespace LibraryAPI.Application.DTOs
         public string Genre { get; set; }
         public string? Description { get; set; }
         public int AuthorId { get; set; }
-        public string? Image { get; set; }
+        public string? Image { get; set; } = null;
     }
 }

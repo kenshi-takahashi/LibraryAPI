@@ -4,6 +4,7 @@ using FluentValidation;
 using System.Security.Claims;
 using LibraryAPI.Application.Interfaces;
 using Microsoft.Extensions.Options;
+using AutoMapper;
 
 namespace LibraryAPI.Application.Services
 {
@@ -11,25 +12,31 @@ namespace LibraryAPI.Application.Services
     {
         private readonly ITokenService _tokenService;
         private readonly IUserRepository _userRepository;
+        private readonly IRoleRepository _roleRepository;
         private readonly IValidator<UserRegistrationRequestDto> _registrationValidator;
         private readonly IValidator<UserLoginRequestDto> _loginValidator;
         private readonly IValidator<TokenRequestDto> _tokenRequestValidator;
         private readonly JwtSettings _jwtSettings;
+        private readonly IMapper _mapper;
 
         public AuthService(
             ITokenService tokenService,
             IUserRepository userRepository,
+            IRoleRepository roleRepository,
             IValidator<UserRegistrationRequestDto> registrationValidator,
             IValidator<UserLoginRequestDto> loginValidator,
             IValidator<TokenRequestDto> tokenRequestValidator,
-            IOptions<JwtSettings> jwtSettings)
+            IOptions<JwtSettings> jwtSettings,
+            IMapper mapper)
         {
             _tokenService = tokenService;
             _userRepository = userRepository;
+            _roleRepository = roleRepository;
             _registrationValidator = registrationValidator;
             _loginValidator = loginValidator;
             _tokenRequestValidator = tokenRequestValidator;
             _jwtSettings = jwtSettings.Value;
+            _mapper = mapper;
         }
 
         public async Task<string> Register(UserRegistrationRequestDto registrationDto)
@@ -46,15 +53,16 @@ namespace LibraryAPI.Application.Services
                 throw new Exception("User with this email already exists.");
             }
 
-            var user = new User
+            var role = await _roleRepository.GetByNameAsync("user");
+            if (role == null)
             {
-                Email = registrationDto.Email,
-                Password = BCrypt.Net.BCrypt.HashPassword(registrationDto.Password),
-                FirstName = registrationDto.FirstName,
-                LastName = registrationDto.LastName,
-                MiddleName = registrationDto.MiddleName,
-                RoleId = 2
-            };
+                throw new Exception("Role 'user' not found.");
+            }
+
+            var user = _mapper.Map<User>(registrationDto);
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(registrationDto.Password);
+            user.Role = role;
 
             await _userRepository.AddAsync(user);
             return "User registered successfully.";
@@ -76,9 +84,9 @@ namespace LibraryAPI.Application.Services
 
             var claims = new List<Claim>
             {
-            new Claim(ClaimTypes.Name, user.Email),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Role, user.Role.Name)
+                new Claim(ClaimTypes.Name, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Role, user.Role.Name)
             };
 
             var accessToken = _tokenService.GenerateAccessToken(claims);

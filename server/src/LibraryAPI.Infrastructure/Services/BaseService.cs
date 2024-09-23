@@ -3,7 +3,7 @@ using LibraryAPI.Application.Interfaces;
 
 public class BaseService<T> : IBaseService<T> where T : class
 {
-    private readonly IBaseRepository<T> _repository;
+    protected readonly IBaseRepository<T> _repository;
 
     public BaseService(IBaseRepository<T> repository)
     {
