@@ -1,3 +1,4 @@
+using Hangfire;
 using LibraryAPI.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +11,7 @@ builder.Services.AddSwagger();
 builder.Services.AddMapper();
 builder.Services.AddControllers();
 builder.Services.AddJwtAuthentication(builder.Configuration);
-builder.Services.AddCustomServices();
+builder.Services.AddCustomServices(builder.Configuration);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<LibraryAPIDbContext>(options =>
@@ -25,6 +26,14 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerWithDarkTheme();
 }
+
+app.UseHangfireDashboard();
+app.UseHangfireServer();
+
+RecurringJob.AddOrUpdate<IBookService>(
+    "check-return-dates",
+    service => service.NotifyUsersAboutReturnDatesAsync(),
+    Cron.Daily);
 
 app.UseExceptionHandlingMiddleware();
 app.UseRouting();
