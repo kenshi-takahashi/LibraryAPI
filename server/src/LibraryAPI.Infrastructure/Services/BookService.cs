@@ -17,13 +17,14 @@ public class BookService : BaseService<Book>, IBookService
     private readonly IValidator<BorrowBookRequestDto> _borrowValidator;
     
 
-    public BookService(IBookRepository bookRepository,
-        IMapper mapper, IMemoryCache cache,
+    public BookService (IBookRepository bookRepository,
+        IMapper mapper, 
+        IMemoryCache cache,
         IUserRepository userRepository,
         IValidator<BookCreateRequestDto> createValidator,
         IValidator<BookUpdateRequestDto> updateValidator,
         IValidator<BorrowBookRequestDto> borrowValidator
-    // IEmailSender emailService
+        // IEmailSender emailService
     ) : base(bookRepository)
     {
         _bookRepository = bookRepository;
