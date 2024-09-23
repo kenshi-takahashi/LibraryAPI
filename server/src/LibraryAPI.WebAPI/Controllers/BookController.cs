@@ -26,6 +26,7 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> GetAllBooks()
         {
             var books = await _bookService.GetAllBooksAsync();
@@ -33,6 +34,7 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = "AdminOrUser")]
         public async Task<IActionResult> GetBookById(int id)
         {
             var book = await _bookService.GetBookByIdAsync(id);
@@ -40,6 +42,7 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpGet("isbn/{isbn}")]
+        [Authorize(Policy = "AdminOrUser")]
         public async Task<IActionResult> GetBooksByISBN(string isbn)
         {
             var books = await _bookService.GetBooksByISBNAsync(isbn);
@@ -47,6 +50,7 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> AddBook([FromBody] BookCreateRequestDto bookDto)
         {
             await _bookService.AddBookAsync(bookDto);
@@ -54,6 +58,7 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] BookUpdateRequestDto bookDto)
         {
             await _bookService.UpdateBookAsync(id, bookDto);
@@ -61,6 +66,7 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteBook(int id)
         {
             await _bookService.DeleteBookAsync(id);
@@ -68,6 +74,7 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpPost("{id}/borrow")]
+        [Authorize(Policy = "AdminOrUser")]
         public async Task<IActionResult> BorrowBook(BorrowBookRequestDto borrowDto)
         {
             await _bookService.BorrowBookAsync(borrowDto);
@@ -75,6 +82,7 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpPost("{id}/image")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> AddBookImage(int id, [FromForm] string imagePath)
         {
             var result = await _bookService.AddBookImageAsync(id, imagePath);
