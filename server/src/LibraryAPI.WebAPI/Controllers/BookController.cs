@@ -1,5 +1,6 @@
 using LibraryAPI.Application.DTOs;
 using LibraryAPI.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -14,6 +15,14 @@ namespace LibraryAPI.Controllers
         public BookController(IBookService bookService)
         {
             _bookService = bookService;
+        }
+
+        [HttpGet("paginated")]
+        [Authorize(Policy = "AdminOrUser")]
+        public async Task<ActionResult<PaginatedResponseDto<BookUserResponseDto>>> GetBooksPaginated([FromQuery] PaginatedRequestDto request)
+        {
+            var authors = await _bookService.GetBooksPaginatedAsync(request);
+            return Ok(authors);
         }
 
         [HttpGet]
@@ -72,11 +81,11 @@ namespace LibraryAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPost("check-return-dates")]
-        public async Task<IActionResult> CheckReturnDates()
-        {
-            await _bookService.NotifyUsersAboutReturnDatesAsync();
-            return Ok("Уведомления отправлены");
-        }
+        // [HttpPost("check-return-dates")]
+        // public async Task<IActionResult> CheckReturnDates()
+        // {
+        //     await _bookService.NotifyUsersAboutReturnDatesAsync();
+        //     return Ok("Уведомления отправлены");
+        // }
     }
 }

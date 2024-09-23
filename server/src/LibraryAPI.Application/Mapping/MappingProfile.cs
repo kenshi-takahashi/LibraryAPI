@@ -31,8 +31,8 @@ namespace LibraryAPI.Application.Mapper
             CreateMap<User, UserSelfResponseDto>();
 
             // PaginatedList mapping
-            CreateMap<PaginatedList<Author>, PaginatedResponseDto<AuthorResponseDto>>()
-                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+            CreateMap<PaginatedList<Author>, PaginatedResponseDto<AuthorResponseDto>>();
+            CreateMap<PaginatedList<Book>, PaginatedResponseDto<BookUserResponseDto>>();
         }
     }
 }

@@ -4,21 +4,33 @@ using LibraryAPI.Application.Interfaces;
 using LibraryAPI.Domain.Entities;
 using Microsoft.Extensions.Caching.Memory;
 
-public class BookService : IBookService
+public class BookService : BaseService<Book>, IBookService
 {
     private readonly IBookRepository _bookRepository;
     private readonly IUserRepository _userRepository;
-    private readonly IEmailSender _emailSender;
+    // private readonly IEmailSender _emailSender;
     private readonly IMapper _mapper;
     private readonly IMemoryCache _cache;
 
-    public BookService(IBookRepository bookRepository, IMapper mapper, IMemoryCache cache, IUserRepository userRepository, IEmailSender emailService)
+    public BookService(IBookRepository bookRepository, 
+        IMapper mapper, IMemoryCache cache, 
+        IUserRepository userRepository 
+        // IEmailSender emailService
+    ) : base(bookRepository)
     {
         _bookRepository = bookRepository;
         _userRepository = userRepository;
-        _emailSender = emailService;
+        // _emailSender = emailService;
         _mapper = mapper;
         _cache = cache;
+    }
+
+    public async Task<PaginatedResponseDto<BookUserResponseDto>> GetBooksPaginatedAsync(PaginatedRequestDto request)
+    {
+        var paginatedList = await GetPaginatedAsync(request.PageIndex, request.PageSize);
+        var response = _mapper.Map<PaginatedResponseDto<BookUserResponseDto>>(paginatedList);
+
+        return response;
     }
 
     public async Task<IEnumerable<BookAdminResponseDto>> GetAllBooksAsync()
@@ -99,21 +111,21 @@ public class BookService : IBookService
 
     public async Task NotifyUsersAboutReturnDatesAsync()
     {
-        var books = await _bookRepository.GetAllAsync();
-        foreach (var book in books)
-        {
-            if (book.ReturnBy.HasValue && book.ReturnBy.Value.Date <= DateTime.UtcNow.Date)
-            {
-                if (book.UserId.HasValue)
-                {
-                    var user = await _userRepository.GetByIdAsync(book.UserId.Value);
-                    var userEmail = user.Email;
-                    string subject = "Возврат книги";
-                    string body = $"Пожалуйста, верните книгу '{book.Title}', ваш срок возврата книги {book.ReturnBy.Value.ToShortDateString()}";
+        // var books = await _bookRepository.GetAllAsync();
+        // foreach (var book in books)
+        // {
+        //     if (book.ReturnBy.HasValue && book.ReturnBy.Value.Date <= DateTime.UtcNow.Date)
+        //     {
+        //         if (book.UserId.HasValue)
+        //         {
+        //             var user = await _userRepository.GetByIdAsync(book.UserId.Value);
+        //             var userEmail = user.Email;
+        //             string subject = "Возврат книги";
+        //             string body = $"Пожалуйста, верните книгу '{book.Title}', ваш срок возврата книги {book.ReturnBy.Value.ToShortDateString()}";
 
-                    await _emailSender.SendEmailAsync(userEmail, subject, body);
-                }
-            }
-        }
+        //             await _emailSender.SendEmailAsync(userEmail, subject, body);
+        //         }
+        //     }
+        // }
     }
 }
