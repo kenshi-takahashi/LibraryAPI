@@ -47,10 +47,10 @@ namespace LibraryAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddBook([FromBody] BookCreateRequestDto bookDto)
+        public async Task<IActionResult> AddBook([FromBody] BookCreateRequestDto bookDto, string imagePath = null)
         {
-            await _bookService.AddBookAsync(bookDto);
-            return CreatedAtAction(nameof(GetBookById), new { id = bookDto.ISBN }, bookDto);
+            await _bookService.AddBookAsync(bookDto, imagePath);
+            return NoContent();
         }
 
         [HttpPut("{id}")]
