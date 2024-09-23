@@ -12,10 +12,10 @@ public class BookService : BaseService<Book>, IBookService
     private readonly IMapper _mapper;
     private readonly IMemoryCache _cache;
 
-    public BookService(IBookRepository bookRepository, 
-        IMapper mapper, IMemoryCache cache, 
-        IUserRepository userRepository 
-        // IEmailSender emailService
+    public BookService(IBookRepository bookRepository,
+        IMapper mapper, IMemoryCache cache,
+        IUserRepository userRepository
+    // IEmailSender emailService
     ) : base(bookRepository)
     {
         _bookRepository = bookRepository;
@@ -27,45 +27,76 @@ public class BookService : BaseService<Book>, IBookService
 
     public async Task<PaginatedResponseDto<BookUserResponseDto>> GetBooksPaginatedAsync(PaginatedRequestDto request)
     {
-        var paginatedList = await GetPaginatedAsync(request.PageIndex, request.PageSize);
-        var response = _mapper.Map<PaginatedResponseDto<BookUserResponseDto>>(paginatedList);
+        var cacheKey = $"PaginatedBooks_{request.PageIndex}_{request.PageSize}";
 
-        return response;
+        return await GetOrAddToCacheAsync(cacheKey, async () =>
+        {
+            var paginatedList = await GetPaginatedAsync(request.PageIndex, request.PageSize);
+            return _mapper.Map<PaginatedResponseDto<BookUserResponseDto>>(paginatedList);
+        }, TimeSpan.FromHours(1));
     }
 
     public async Task<IEnumerable<BookAdminResponseDto>> GetAllBooksAsync()
     {
-        var books = await _bookRepository.GetAllAsync();
-        return _mapper.Map<IEnumerable<BookAdminResponseDto>>(books);
+        var cacheKey = "AllBooks";
+
+        return await GetOrAddToCacheAsync(cacheKey, async () =>
+        {
+            var books = await _bookRepository.GetAllAsync();
+            return _mapper.Map<IEnumerable<BookAdminResponseDto>>(books);
+        }, TimeSpan.FromHours(1));
     }
 
     public async Task<BookAdminResponseDto> GetBookByIdAsync(int id)
     {
-        var book = await _bookRepository.GetByIdAsync(id);
-        return _mapper.Map<BookAdminResponseDto>(book);
+        var cacheKey = $"Book_{id}";
+
+        return await GetOrAddToCacheAsync(cacheKey, async () =>
+        {
+            var book = await _bookRepository.GetByIdAsync(id);
+            return _mapper.Map<BookAdminResponseDto>(book);
+        }, TimeSpan.FromHours(1));
     }
+
 
     public async Task<IEnumerable<BookAdminResponseDto>> GetBooksByISBNAsync(string isbn)
     {
-        var books = await _bookRepository.GetByISBNAsync(isbn);
-        return _mapper.Map<IEnumerable<BookAdminResponseDto>>(books);
+        var cacheKey = $"BooksByISBN_{isbn}";
+
+        return await GetOrAddToCacheAsync(cacheKey, async () =>
+        {
+            var books = await _bookRepository.GetByISBNAsync(isbn);
+            return _mapper.Map<IEnumerable<BookAdminResponseDto>>(books);
+        }, TimeSpan.FromHours(1));
     }
 
-    public async Task AddBookAsync(BookCreateRequestDto bookDto)
+
+    public async Task AddBookAsync(BookCreateRequestDto bookDto, string imagePath = null)
     {
         var book = _mapper.Map<Book>(bookDto);
         await _bookRepository.AddAsync(book);
+
+        if (!string.IsNullOrEmpty(imagePath))
+        {
+            await AddBookImageAsync(book.Id, imagePath);
+        }
     }
+
 
     public async Task UpdateBookAsync(int id, BookUpdateRequestDto bookDto)
     {
+        var cacheKey = $"Book_{id}";
+
         var book = await _bookRepository.GetByIdAsync(id);
         if (book != null)
         {
             _mapper.Map(bookDto, book);
             await _bookRepository.UpdateAsync(book);
+
+            _cache.Set(cacheKey, _mapper.Map<BookAdminResponseDto>(book), TimeSpan.FromHours(1));
         }
     }
+
 
     public async Task DeleteBookAsync(int id)
     {
@@ -127,5 +158,17 @@ public class BookService : BaseService<Book>, IBookService
         //         }
         //     }
         // }
+    }
+
+    private async Task<T> GetOrAddToCacheAsync<T>(string cacheKey, Func<Task<T>> getData, TimeSpan cacheDuration)
+    {
+        if (_cache.TryGetValue(cacheKey, out T cachedData))
+        {
+            return cachedData;
+        }
+
+        var data = await getData();
+        _cache.Set(cacheKey, data, cacheDuration);
+        return data;
     }
 }
