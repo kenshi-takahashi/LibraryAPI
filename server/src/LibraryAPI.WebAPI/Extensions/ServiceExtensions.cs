@@ -16,12 +16,12 @@ namespace LibraryAPI.Extensions
             services.AddHangfireServer();
 
             // Services
-            services.AddSingleton(provider =>
-            {
-                return GmailServiceInitializer.GetGmailServiceAsync().GetAwaiter().GetResult();
-            });
-            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
-            services.AddTransient<IEmailSender, EmailSender>();
+            // services.AddSingleton(provider =>
+            // {
+            //     return GmailServiceInitializer.GetGmailServiceAsync().GetAwaiter().GetResult();
+            // });
+            // services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+            // services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddTransient<ITokenService, TokenService>();
             services.AddScoped<IAuthService, AuthService>();

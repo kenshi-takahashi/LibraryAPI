@@ -30,10 +30,10 @@ if (app.Environment.IsDevelopment())
 app.UseHangfireDashboard();
 app.UseHangfireServer();
 
-RecurringJob.AddOrUpdate<IBookService>(
-    "check-return-dates",
-    service => service.NotifyUsersAboutReturnDatesAsync(),
-    Cron.Daily);
+// RecurringJob.AddOrUpdate<IBookService>(
+//     "check-return-dates",
+//     service => service.NotifyUsersAboutReturnDatesAsync(),
+//     Cron.Daily);
 
 app.UseExceptionHandlingMiddleware();
 app.UseRouting();
