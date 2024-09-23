@@ -53,10 +53,10 @@ namespace LibraryAPI.Application.Services
                 throw new Exception("User with this email already exists.");
             }
 
-            var role = await _roleRepository.GetByNameAsync("User");
+            var role = await _roleRepository.GetByNameAsync("user");
             if (role == null)
             {
-                throw new Exception("Role 'User' not found.");
+                throw new Exception("Role 'user' not found.");
             }
 
             var user = _mapper.Map<User>(registrationDto);
