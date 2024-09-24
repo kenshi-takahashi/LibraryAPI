@@ -35,17 +35,27 @@ public class BookRepository : BaseRepository<Book>, IBookRepository
 
     public async Task<IEnumerable<Book>> GetByAuthorFullNameAsync(string authorFullName)
     {
+        var names = authorFullName.Split(' ', 2);
+        var firstName = names[0];
+        var lastName = names.Length > 1 ? names[1] : string.Empty;
+
         return await _dbSet.AsNoTracking()
             .Include(b => b.Author)
-            .Where(b => EF.Functions.Like(b.Author.FullName, $"%{authorFullName}%"))
+            .Where(b => b.Author.FirstName == firstName &&
+                        (string.IsNullOrEmpty(lastName) || b.Author.LastName == lastName))
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Book>> GetByUserFullNameAsync(string userFullName)
     {
+        var names = userFullName.Split(' ', 2);
+        var firstName = names[0];
+        var lastName = names.Length > 1 ? names[1] : string.Empty;
+
         return await _dbSet.AsNoTracking()
             .Include(b => b.User)
-            .Where(b => EF.Functions.Like(b.User.FullName, $"%{userFullName}%"))
+            .Where(b => b.User.FirstName == firstName &&
+                        (string.IsNullOrEmpty(lastName) || b.User.LastName == lastName))
             .ToListAsync();
     }
 }
