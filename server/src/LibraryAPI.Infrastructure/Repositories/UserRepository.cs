@@ -20,10 +20,11 @@ public class UserRepository : BaseRepository<User>, IUserRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<User>> GetByFullNameAsync(string fullName)
+    public async Task<IEnumerable<User>> GetByFullNameAsync(string firstName, string lastName)
     {
         return await _dbSet.AsNoTracking()
-            .Where(u => u.FullName.Contains(fullName))
+            .Where(u => u.FirstName.Contains(firstName) && u.LastName.Contains(lastName))
             .ToListAsync();
     }
+
 }
