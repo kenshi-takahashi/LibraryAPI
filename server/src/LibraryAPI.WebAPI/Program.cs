@@ -1,6 +1,5 @@
 using Hangfire;
 using LibraryAPI.Extensions;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,10 +11,7 @@ builder.Services.AddMapper();
 builder.Services.AddControllers();
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddCustomServices(builder.Configuration);
-
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<LibraryAPIDbContext>(options =>
-    options.UseSqlServer(connectionString));
+builder.Services.AddDatabaseServices(builder.Configuration);
 
 var app = builder.Build();
 
@@ -41,5 +37,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.UseHttpsRedirection();
+app.InitializeDatabase();
 
 app.Run();
